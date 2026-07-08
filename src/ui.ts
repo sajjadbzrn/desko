@@ -25,7 +25,10 @@ function relativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-const PRIORITY_META: Record<Priority, { icon: string; color: (t: string) => string; label: string }> = {
+const PRIORITY_META: Record<
+  Priority,
+  { icon: string; color: (t: string) => string; label: string }
+> = {
   high: { icon: "▲", color: (t) => color.hex("#f87171")(t), label: "high" },
   medium: { icon: "◆", color: (t) => color.hex("#fbbf24")(t), label: "med" },
   low: { icon: "▽", color: (t) => color.hex("#60a5fa")(t), label: "low" },
@@ -82,24 +85,23 @@ function emptyState(message: string): void {
 
 export function renderTaskList(tasks: Task[]): void {
   if (tasks.length === 0) {
-    emptyState("No tasks to show. Add one with:  desko add \"your task\"");
+    emptyState('No tasks to show. Add one with:  desko add "your task"');
     return;
   }
 
   const rows: string[][] = [
-    ["#", "", "Priority", "Task", "Age"],
+    ["#", "Priority", "Task", "Age"],
     ...tasks.map((task) => {
       const status = task.done
-        ? color.hex("#34d399")("✓")
-        : color.hex("#fbbf24")("○");
+        ? color.hex("#34d399")("[x]")
+        : color.hex("#fbbf24")("[ ]");
       const desc = task.done
         ? color.gray(color.strikethrough(task.description))
         : color.white(task.description);
       return [
         dim(String(task.id)),
-        status,
         priorityTag(task.priority),
-        desc,
+        status + " " + desc,
         dim(relativeTime(task.createdAt)),
       ];
     }),
@@ -110,7 +112,6 @@ export function renderTaskList(tasks: Task[]): void {
     components.table(rows, {
       header: true,
       borderStyle: "rounded",
-      padding: 1,
     }),
   );
   console.log();
