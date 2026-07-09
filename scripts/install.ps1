@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     desko -- Installer for Windows
 .DESCRIPTION
@@ -391,14 +391,14 @@ Write-Host ""
 Write-Host "  Quick start:" -ForegroundColor Cyan
 $deskoPath = (Get-Command "desko" -ErrorAction SilentlyContinue).Source
 if ($deskoPath) {
-    Write-Host "    desko add \"Buy groceries\" --priority high" -ForegroundColor Cyan
+    Write-Host "    desko add `"Buy groceries`" --priority high" -ForegroundColor Cyan
     Write-Host "    desko list" -ForegroundColor Cyan
     Write-Host "    desko stats" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "  Need help?  desko --help" -ForegroundColor Cyan
 } else {
     Write-Warn "Restart your terminal, then try:"
-    Write-Host "    desko add \"Buy groceries\" --priority high" -ForegroundColor Cyan
+    Write-Host "    desko add `"Buy groceries`" --priority high" -ForegroundColor Cyan
     Write-Host "    desko list" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "  Need help?  desko --help" -ForegroundColor Cyan

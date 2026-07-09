@@ -33,14 +33,15 @@ The installer will download the right binary for your platform, place it in `~/.
 
 ### Manual download
 
-Pre-built binaries are available for **Windows**, **macOS**, and **Linux** on the [Releases](https://github.com/sajjadbzrn/desko/releases) page.
+Pre-built binaries are available for **Windows**, **macOS (Apple Silicon)**, and **Linux** on the [Releases](https://github.com/sajjadbzrn/desko/releases) page.
 
 | Platform | Download |
 | -------- | -------- |
 | **Windows** (x64) | `desko-windows-x64.exe` |
 | **macOS** (Apple Silicon) | `desko-macos-arm64` |
-| **macOS** (Intel) | `desko-macos-x64` |
 | **Linux** (x64) | `desko-linux-x64` |
+
+> **Note:** macOS x64 (Intel) builds are no longer available via GitHub Actions. Intel Mac users can build from source or run the ARM64 binary via [Rosetta 2](https://support.apple.com/en-us/102522).
 
 After downloading, add the binary to your `PATH` or run it directly:
 

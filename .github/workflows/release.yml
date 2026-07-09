@@ -27,9 +27,6 @@ jobs:
           - os: macos-latest
             artifact_name: desko-macos-arm64
             binary_name: desko
-          - os: macos-13
-            artifact_name: desko-macos-x64
-            binary_name: desko
           - os: windows-latest
             artifact_name: desko-windows-x64.exe
             binary_name: desko.exe
