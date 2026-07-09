@@ -22,7 +22,7 @@ const program = new Command();
 program
   .name("desko")
   .description("Beautiful task manager CLI")
-  .version("1.0.0");
+  .version("1.1.0");
 
 program
   .command("add <description>")

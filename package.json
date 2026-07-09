@@ -1,6 +1,6 @@
 {
   "name": "desko",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "Beautiful task manager CLI with ansimax",
   "type": "module",
   "scripts": {
