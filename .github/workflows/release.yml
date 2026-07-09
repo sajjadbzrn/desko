@@ -42,7 +42,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Build executable
         run: bun build --compile --minify --sourcemap ./src/index.ts --outfile ${{ matrix.binary_name }}
