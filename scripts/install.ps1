@@ -12,16 +12,23 @@
     .\install.ps1 -InstallDir C:\tools\desko
 #>
 
-param(
-    [string]$Version = "latest",
-    [string]$InstallDir = "",
-    [switch]$Help
-)
-
 $Repo = "sajjadbzrn/desko"
 $ScriptStart = Get-Date
 
-# -- help ----------------------------------------------------------------
+$Version = "latest"
+$InstallDir = ""
+$Help = $false
+
+if ($args -and $args.Count -gt 0) {
+    for ($i = 0; $i -lt $args.Count; $i++) {
+        switch -regex ($args[$i]) {
+            '^(-|/)Version$'   { if ($i + 1 -lt $args.Count) { $Version = $args[++$i] } }
+            '^(-|/)InstallDir$' { if ($i + 1 -lt $args.Count) { $InstallDir = $args[++$i] } }
+            '^(-|/)Help$'       { $Help = $true }
+            '^(-|/)[h?]$'       { $Help = $true }
+        }
+    }
+}
 
 if ($Help) {
     Write-Host "desko -- Installer for Windows" -ForegroundColor Cyan
@@ -30,12 +37,13 @@ if ($Help) {
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -Version [tag]   Install a specific version (default: latest)"
-    Write-Host "  -InstallDir [d]  Install to a custom directory"
+    Write-Host "  -InstallDir [d]  Install to a custom directory (default: ~\.desko\bin)"
     Write-Host "  -Help            Show this help"
     Write-Host ""
     Write-Host "Examples:"
     Write-Host "  irm https://raw.githubusercontent.com/$Repo/main/scripts/install.ps1 | iex"
     Write-Host "  .\install.ps1 -Version v0.1.0"
+    Write-Host "  .\install.ps1 -InstallDir C:\tools\desko"
     Exit 0
 }
 
@@ -125,10 +133,10 @@ function Invoke-Download {
 
     Write-Log "Connecting to $Url ..." -Color Blue
 
-    # Use fully synchronous WebRequest (no deadlock risk)
     $request = [System.Net.WebRequest]::Create($Url)
-    $request.Timeout = 600000  # 10 minutes
+    $request.Timeout = 600000
     $request.UserAgent = "desko-installer/1.0"
+    $request.AllowAutoRedirect = $true
 
     try {
         $response = $request.GetResponse()
@@ -137,12 +145,11 @@ function Invoke-Download {
         $fileStream = [System.IO.File]::Create($OutFile)
 
         try {
-            $buffer = New-Object byte[] 65536  # 64KB chunks
+            $buffer = New-Object byte[] 65536
             $totalRead = [long]0
             $lastReportedPct = -1
 
             if ($totalBytes -le 0) {
-                # Unknown file size -- show byte-count progress
                 Write-Log "Downloading (size unknown)..." -Color Yellow
                 while (($read = $responseStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
                     $fileStream.Write($buffer, 0, $read)
@@ -153,7 +160,6 @@ function Invoke-Download {
                 }
                 Write-Host "`r  Downloaded $([math]::Round($totalRead / 1MB, 1)) MB -- complete!    "
             } else {
-                # Known file size -- show percentage bar
                 while (($read = $responseStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
                     $fileStream.Write($buffer, 0, $read)
                     $totalRead += $read
@@ -165,7 +171,6 @@ function Invoke-Download {
                     }
                 }
 
-                # Final 100%
                 Write-DownloadProgress -Percent 100 -BytesReceived $totalRead -TotalBytes $totalBytes
                 Write-Host ""
                 Write-Host ""
@@ -174,9 +179,15 @@ function Invoke-Download {
             if ($fileStream) { $fileStream.Close() }
             if ($responseStream) { $responseStream.Close() }
         }
+    } catch [System.Net.WebException] {
+        $statusCode = 0
+        if ($_.Exception.Response) { $statusCode = [int]$_.Exception.Response.StatusCode }
+        if ($statusCode -eq 404) {
+            throw "HTTP 404 -- Release not found. Verify a release exists for version '$Version'."
+        }
+        throw "HTTP $statusCode -- $_"
     } catch {
-        Write-Error "Download failed: $_"
-        throw
+        throw $_
     } finally {
         if ($response) { $response.Close() }
     }
@@ -290,6 +301,24 @@ if ($fileSize -eq 0) {
     Write-Error "Download returned an empty file."
     Write-Log "The release asset may be missing or corrupt." -Color Yellow
     Write-Log "Check: https://github.com/$Repo/releases" -Color Yellow
+    Remove-Item -Recurse -Force $TmpDir -ErrorAction SilentlyContinue
+    Exit 1
+}
+
+$peCheckStream = [System.IO.File]::OpenRead($TmpBin)
+$magic = New-Object byte[] 2
+$null = $peCheckStream.Read($magic, 0, 2)
+$peCheckStream.Close()
+
+if ($magic[0] -ne 77 -or $magic[1] -ne 90) {
+    Write-Error "Downloaded file is not a valid Windows executable."
+    Write-Log "GitHub may have returned an error page instead of the binary." -Color Yellow
+    Write-Log "This can happen if:" -Color Yellow
+    Write-Log "  - No release exists yet for version '$Version'" -Color Yellow
+    Write-Log "  - The asset name '$Asset' does not match the release" -Color Yellow
+    Write-Log ""
+    Write-Log "Check the releases page:" -Color Yellow
+    Write-Log "  https://github.com/$Repo/releases" -Color Yellow
     Remove-Item -Recurse -Force $TmpDir -ErrorAction SilentlyContinue
     Exit 1
 }
