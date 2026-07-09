@@ -76,6 +76,11 @@ jobs:
           path: artifacts
           merge-multiple: true
 
+      - name: Copy install scripts
+        run: |
+          cp scripts/install.sh artifacts/
+          cp scripts/install.ps1 artifacts/
+
       - name: Determine tag
         id: tag
         run: |

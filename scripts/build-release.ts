@@ -12,7 +12,9 @@ const PLATFORMS = [
 type Platform = (typeof PLATFORMS)[number];
 
 function getBinaryName(platform: Platform): string {
-  return platform === "windows-x64" ? "desko-windows-x64.exe" : `desko-${platform}`;
+  return platform === "windows-x64"
+    ? "desko-windows-x64.exe"
+    : `desko-${platform}`;
 }
 
 function getCurrentPlatform(): Platform {
@@ -53,11 +55,16 @@ async function build(target?: Platform) {
 
   const proc = Bun.spawnSync(
     [
-      "bun", "build", "--compile", "--minify", "--sourcemap",
+      "bun",
+      "build",
+      "--compile",
+      "--minify",
+      "--sourcemap",
       "./src/index.ts",
-      "--outfile", tempBin,
+      "--outfile",
+      tempBin,
     ],
-    { stdio: "inherit" }
+    { stdio: "inherit" },
   );
 
   if (proc.exitCode !== 0) {

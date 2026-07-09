@@ -15,9 +15,25 @@ A beautiful task manager CLI for your terminal. Add, complete, and track tasks w
 - **Fast** — Built on [Bun](https://bun.sh) for instant startup
 - **Persistent storage** — Tasks saved in `~/.desko/tasks.json`
 
-## Download
+## Install
 
-Pre-built binaries are available for **Windows**, **macOS**, and **Linux** on the [Releases](https://github.com/your-username/desko/releases) page.
+### One-liner (recommended)
+
+**macOS / Linux**
+```bash
+curl -fsSL https://raw.githubusercontent.com/sajjadbzrn/desko/main/scripts/install.sh | sh
+```
+
+**Windows** (PowerShell)
+```powershell
+irm https://raw.githubusercontent.com/sajjadbzrn/desko/main/scripts/install.ps1 | iex
+```
+
+The installer will download the right binary for your platform, place it in `~/.desko/bin/`, and add it to your PATH.
+
+### Manual download
+
+Pre-built binaries are available for **Windows**, **macOS**, and **Linux** on the [Releases](https://github.com/sajjadbzrn/desko/releases) page.
 
 | Platform | Download |
 | -------- | -------- |
@@ -41,7 +57,7 @@ desko-windows-x64.exe --version
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/desko.git
+git clone https://github.com/sajjadbzrn/desko.git
 cd desko
 
 # Install dependencies
